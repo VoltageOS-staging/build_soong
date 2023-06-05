@@ -78,6 +78,11 @@ var (
 			"-mfloat-abi=softfp",
 			"-mfpu=neon-fp-armv8",
 		},
+		"armv9-a": []string{
+			"-march=armv9-a",
+			"-mfloat-abi=softfp",
+			"-mfpu=neon-fp-armv8",
+		},
 	}
 
 	armCpuVariantCflags = map[string][]string{
@@ -122,6 +127,15 @@ var (
 		},
 		"cortex-a55": []string{
 			"-mcpu=cortex-a55",
+			"-mfpu=neon-fp-armv8",
+			// Fake an ARM compiler flag as these processors support LPAE which clang
+			// don't advertise.
+			// TODO This is a hack and we need to add it for each processor that supports LPAE until some
+			// better solution comes around. See Bug 27340895
+			"-D__ARM_FEATURE_LPAE=1",
+		},
+		"cortex-a710": []string{
+			"-mcpu=cortex-a710",
 			"-mfpu=neon-fp-armv8",
 			// Fake an ARM compiler flag as these processors support LPAE which clang
 			// don't advertise.
@@ -222,6 +236,7 @@ func init() {
 	exportedVars.ExportStringListStaticVariable("ArmArmv7ANeonCflags", armArchVariantCflags["armv7-a-neon"])
 	exportedVars.ExportStringListStaticVariable("ArmArmv8ACflags", armArchVariantCflags["armv8-a"])
 	exportedVars.ExportStringListStaticVariable("ArmArmv82ACflags", armArchVariantCflags["armv8-2a"])
+	exportedVars.ExportStringListStaticVariable("ArmArmv9ACflags", armArchVariantCflags["armv9-a"])
 
 	// Clang cpu variant cflags
 	exportedVars.ExportStringListStaticVariable("ArmGenericCflags", armCpuVariantCflags[""])
@@ -232,6 +247,7 @@ func init() {
 	exportedVars.ExportStringListStaticVariable("ArmCortexA53Cflags", armCpuVariantCflags["cortex-a53"])
 	exportedVars.ExportStringListStaticVariable("ArmCortexA55Cflags", armCpuVariantCflags["cortex-a55"])
 	exportedVars.ExportStringListStaticVariable("ArmCortexA76Cflags", armCpuVariantCflags["cortex-a76"])
+	exportedVars.ExportStringListStaticVariable("ArmCortexA710Cflags", armCpuVariantCflags["cortex-a710"])
 	exportedVars.ExportStringListStaticVariable("ArmKraitCflags", armCpuVariantCflags["krait"])
 	exportedVars.ExportStringListStaticVariable("ArmKryoCflags", armCpuVariantCflags["kryo"])
 	exportedVars.ExportStringListStaticVariable("ArmKryo485Cflags", armCpuVariantCflags["kryo485"])
@@ -243,6 +259,7 @@ var (
 		"armv7-a-neon": "${config.ArmArmv7ANeonCflags}",
 		"armv8-a":      "${config.ArmArmv8ACflags}",
 		"armv8-2a":     "${config.ArmArmv82ACflags}",
+		"armv9-a":      "${config.ArmArmv9ACflags}",
 	}
 
 	armCpuVariantCflagsVar = map[string]string{
@@ -255,6 +272,7 @@ var (
 		"cortex-a53":     "${config.ArmCortexA53Cflags}",
 		"cortex-a53.a57": "${config.ArmCortexA53Cflags}",
 		"cortex-a55":     "${config.ArmCortexA55Cflags}",
+		"cortex-a710":    "${config.ArmCortexA710Cflags}",
 		"cortex-a72":     "${config.ArmCortexA53Cflags}",
 		"cortex-a73":     "${config.ArmCortexA53Cflags}",
 		"cortex-a75":     "${config.ArmCortexA55Cflags}",
@@ -350,7 +368,7 @@ func armToolchainFactory(arch android.Arch) Toolchain {
 		}
 	case "armv7-a":
 		fixCortexA8 = "${config.ArmFixCortexA8LdFlags}"
-	case "armv8-a", "armv8-2a":
+	case "armv8-a", "armv8-2a", "armv9-a":
 		// Nothing extra for armv8-a/armv8-2a
 	default:
 		panic(fmt.Sprintf("Unknown ARM architecture version: %q", arch.ArchVariant))
