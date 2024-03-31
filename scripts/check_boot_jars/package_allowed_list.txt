@@ -230,6 +230,10 @@ vendor\.lineage\.touch.*
 com.voltage.*
 vendor.voltage.*
 
+# NT adds
+com\.nothing
+com\.nothing\..*
+
 ###################################################
 # CodeAurora IMS functionality needed by frameworks/opt/telephony
 # as part of "ims-ext-common"
