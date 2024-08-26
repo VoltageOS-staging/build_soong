@@ -309,3 +309,6 @@ com.oneplus.*
 vendor.oneplus.*
 
 ###################################################
+
+# LMODroid adds
+com\.libremobileos.*
