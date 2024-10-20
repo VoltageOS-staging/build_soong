@@ -131,6 +131,8 @@ def parse_args():
 
   override_config(config)
 
+  config["VoltageDevice"] = config["DeviceName"]
+
   append_additional_system_props(args)
   append_additional_vendor_props(args)
   append_additional_product_props(args)
@@ -249,6 +251,8 @@ def generate_build_info(args):
   # Only add _asan for a sanitized build if it isn't already a part of the
   # flavor (via a dedicated lunch config for example).
   print(f"ro.build.flavor={config['BuildFlavor']}")
+
+  print(f"ro.voltage.device={config['VoltageDevice']}")
 
   # These values are deprecated, use "ro.product.cpu.abilist"
   # instead (see below).
