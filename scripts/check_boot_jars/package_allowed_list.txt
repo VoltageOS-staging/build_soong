@@ -226,6 +226,10 @@ vendor\.lineage\.health.*
 vendor\.lineage\.livedisplay.*
 vendor\.lineage\.touch.*
 
+# Voltage adds
+com.voltage.*
+vendor.voltage.*
+
 ###################################################
 # CodeAurora IMS functionality needed by frameworks/opt/telephony
 # as part of "ims-ext-common"
