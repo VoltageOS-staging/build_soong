@@ -35,7 +35,6 @@ import (
 	"github.com/google/blueprint/proptools"
 
 	"android/soong/android/soongconfig"
-	"android/soong/remoteexec"
 	"android/soong/shared"
 )
 
@@ -1436,7 +1435,14 @@ func (c *config) ExtraOtaRecoveryKeys() []string {
 }
 
 func (c *config) BuildKeys() string {
-	return "release-keys"
+	defaultCert := String(c.productVariables.DefaultAppCertificate)
+	if defaultCert == "" || defaultCert == filepath.Join(testKeyDir, "testkey") {
+		return "test-keys"
+	}
+	if strings.HasPrefix(defaultCert, "vendor/lineage-priv/") {
+		return "release-keys"
+	}
+	return "dev-keys"
 }
 
 func (c *config) ApexKeyDir(ctx ModuleContext) SourcePath {
@@ -1932,10 +1938,6 @@ func (c *deviceConfig) DeviceKernelHeaderDirs() []string {
 	return c.config.productVariables.DeviceKernelHeaders
 }
 
-func (c *deviceConfig) TargetSpecificHeaderPath() string {
-	return String(c.config.productVariables.TargetSpecificHeaderPath)
-}
-
 // JavaCoverageEnabledForPath returns whether Java code coverage is enabled for
 // path. Coverage is enabled by default when the product variable
 // JavaCoveragePaths is empty. If JavaCoveragePaths is not empty, coverage is
@@ -2396,7 +2398,7 @@ func (c *config) ApexBootJars() ConfiguredJarList {
 }
 
 func (c *config) RBEWrapper() string {
-	return c.GetenvWithDefault("RBE_WRAPPER", remoteexec.DefaultWrapperPath)
+	return c.GetenvWithDefault("RBE_WRAPPER", "build/rbe/rewrapper_shim.sh")
 }
 
 // UseHostMusl returns true if the host target has been configured to build against musl libc.
