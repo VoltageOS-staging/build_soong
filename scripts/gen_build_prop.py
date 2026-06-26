@@ -129,12 +129,12 @@ def parse_args():
   if args.build_thumbprint_file:
     config["BuildThumbprint"] = args.build_thumbprint_file.read().strip()
 
+  config["VoltageDevice"] = config["DeviceName"]
+
   if config["BuildNumber"].startswith("eng."):
     config["BuildNumber"] = config["DateUtc"]
 
   override_config(config)
-
-  config["VoltageDevice"] = config["DeviceName"]
 
   append_additional_system_props(args)
   append_additional_vendor_props(args)
